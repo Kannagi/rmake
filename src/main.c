@@ -29,6 +29,8 @@ typedef struct
     
     char cmd_execute[256];
 
+    char crt0[256];
+
     char folder[2048];
     char file[2048];
 
@@ -230,6 +232,8 @@ void rmakeInit(RMAKE *rmake,char *buffer,int n)
     rmake->cmd_linker[0] = 0;
     rmake->cmd_compiler[0] = 0;
 
+    rmake->crt0[0] = 0;
+
     rmake->obj = malloc(0x100000);
     memset(rmake->obj,0,0x100000);
 
@@ -347,9 +351,26 @@ void rmakeCommand(FILE *file,RMAKE *rmake,char *buffer,char *filename,int compil
                 else
                     fputs(".cpp",file);
 
-                strcat(rmake->obj,"obj/");
-                strcat(rmake->obj,filename);
-                strcat(rmake->obj,".o ");
+                char crt0[6];
+
+                int n = strlen(filename);
+
+                crt0[0] = filename[n-4];
+                crt0[1] = filename[n-3];
+                crt0[2] = filename[n-2];
+                crt0[3] = filename[n-1];
+                crt0[4] = filename[n-0];
+                crt0[5] = 0;
+
+                if(strcmp(crt0,"crt0") == 0)
+                {
+                    sprintf(rmake->crt0,"obj/%s.o ",filename);
+                }else
+                {
+                    strcat(rmake->obj,"obj/");
+                    strcat(rmake->obj,filename);
+                    strcat(rmake->obj,".o ");
+                }
 
                 folderRCreate(filename,"obj/");
             }
@@ -364,6 +385,7 @@ void rmakeCommand(FILE *file,RMAKE *rmake,char *buffer,char *filename,int compil
                 }
                 else
                 {
+                    fputs(rmake->crt0,file);
                     fputs(rmake->obj,file);
                 }
                 
@@ -500,6 +522,8 @@ void rmakeCreate(RMAKE *rmake)
         printf("Error write file compile.sh\n");
         return;
     }
+
+    dirCreate("obj");
         
     fputs(bin_sh,file);
 
@@ -567,7 +591,7 @@ int main(int argc, char *argv[])
     int fsize;
 
     char filename[256];
-    strcpy(filename,"rmake.txt");
+    strcpy(filename,"rmake.sh");
 
     if(argc == 2)
         strcpy(filename,argv[1]);
