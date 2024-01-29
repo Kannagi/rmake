@@ -1,0 +1,32 @@
+{
+
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile",
+            "type": "shell",
+            "command": "bash .vscode/compile.sh",
+            "windows": {
+                "command": ""
+              },
+        },
+
+        {
+            "label": "Execute",
+            "type": "shell",
+            "command": "bash .vscode/execute.sh",
+            "windows": {
+                "command": ""
+              },
+        },
+
+        {
+            "label": "Compile_Init",
+            "type": "shell",
+            "command": "gcc -O2 -Wall -Wextra -s main.c -o rmake",
+            "windows": {
+                "command": ""
+              },
+        },
+    ]
+}
